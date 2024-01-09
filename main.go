@@ -7,10 +7,18 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"time"
 
+	"github.com/briandowns/spinner"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	badger "github.com/dgraph-io/badger/v4"
 	json "github.com/goccy/go-json"
+
+	"net/http"
+
+	"github.com/logrusorgru/aurora/v4"
+
+	"github.com/gin-gonic/gin"
 )
 
 type AccountVote struct {
@@ -41,28 +49,54 @@ type VotingDetails struct {
 	VotedBy        int             `json:"voted_by"` // 0 = user, 1 = validator
 }
 
+var DB *badger.DB
+
+const DB_CHECK_KEY = "DB_CHECK"
+
 func main() {
+
+	refreshDB := len(os.Args) > 1 && os.Args[1] == "refresh"
 
 	db, err := badger.Open(badger.DefaultOptions("/tmp/badger"))
 	if err != nil {
 		log.Fatal(err)
 	}
+	DB = db
 	defer db.Close()
-	// calculateAndStoreData(db)
 
-	votingDetails := fetchData(db, "cosmos10mkyedcp04a7f4l603hqpuk3z57hg3xpepehaa")
-	jsonData, err := json.MarshalIndent(votingDetails, "", "    ")
-	if err != nil {
-		log.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
+	if refreshDB {
+		clearDatabaseKey()
+		fmt.Println("Starting DB Refresh!")
 	}
 
-	// Print JSON
-	fmt.Println(string(jsonData))
-}
+	isDatabaseAlreadyStored := checkDatabaseKey()
+	if !isDatabaseAlreadyStored || refreshDB {
+		s := spinner.New(spinner.CharSets[43], 100*time.Millisecond)
+		s.Start()
+		fmt.Println(aurora.Blink(aurora.Cyan("Building the database, Please Wait few minutes!")))
+		startTime := time.Now() // Capture start time
+		calculateAndStoreData()
+		duration := time.Since(startTime) // Calculate the duration
+		s.Stop()
+		fmt.Println(aurora.Sprintf(aurora.Bold(aurora.Cyan("Successfully stored the data in %.2f seconds!!!\n")), duration.Seconds()))
+	}
 
-func fetchData(db *badger.DB, address string) VotingDetails {
+	router := gin.Default()
+	router.GET("/:address", fetchAddress)
+	fmt.Println(aurora.Bold(aurora.Cyan("Web server started at localhost:8080 !!")))
+	fmt.Println(aurora.Bold(aurora.Cyan("Example Address Data link -> localhost:8080/cosmos10mkyedcp04a7f4l603hqpuk3z57hg3xpepehaa").Hyperlink("http://localhost:8080/cosmos1n229vhepft6wnkt5tjpwmxdmcnfz55jv5c4tj7")))
+	router.Run("localhost:8080")
+
+}
+func fetchAddress(c *gin.Context) {
+	address := c.Param("address")
+	fmt.Print(address)
+	votingDetails := fetchData(address)
+	c.IndentedJSON(http.StatusOK, votingDetails)
+}
+func fetchData(address string) VotingDetails {
 	var retrievedDetails VotingDetails
-	err := db.View(func(txn *badger.Txn) error {
+	err := DB.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(address))
 		if err != nil {
 			return err
@@ -79,12 +113,29 @@ func fetchData(db *badger.DB, address string) VotingDetails {
 		fmt.Print(err)
 	}
 	return retrievedDetails
-
 }
 
-func calculateAndStoreData(db *badger.DB) {
+func clearDatabaseKey() {
+	DB.Update(func(txn *badger.Txn) error {
+		return txn.Delete([]byte(DB_CHECK_KEY))
+	})
+}
 
-	data, _ := os.ReadFile("cosmoshub-4-export-18010657.json")
+func checkDatabaseKey() bool {
+	err := DB.View(func(txn *badger.Txn) error {
+		_, err := txn.Get([]byte(DB_CHECK_KEY))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return err == nil
+}
+
+func calculateAndStoreData() {
+
+	data, _ := os.ReadFile("data/cosmoshub-4-export-18010657.json")
 	var jsonData map[string]interface{}
 	if err := json.Unmarshal(data, &jsonData); err != nil {
 		fmt.Println("Error unmarshaling JSON:", err)
@@ -122,21 +173,18 @@ func calculateAndStoreData(db *badger.DB) {
 	}
 	topDelegations, err := extractTopDelegations(staking, topValidatorsAddressMap)
 	if err != nil {
-		// Printing the error
 		fmt.Println("Error occurred extractTopDelegations:", err)
 		return
 	}
 
 	delegators, err := calculateDelegationGroupByAccount(topDelegations)
 	if err != nil {
-		// Printing the error
 		fmt.Println("Error occurred calculateDelegationGroupByAccount:", err)
 		return
 	}
 
 	votes, err := extractVotesProposal848(appState)
 	if err != nil {
-		// Printing the error
 		fmt.Println("Error occurred extractVotesProposal848:", err)
 		return
 	}
@@ -155,13 +203,18 @@ func calculateAndStoreData(db *badger.DB) {
 		}
 
 		// Store in BadgerDB
-		err = db.Update(func(txn *badger.Txn) error {
+		err = DB.Update(func(txn *badger.Txn) error {
 			return txn.Set([]byte(key), serializedData)
 		})
 		if err != nil {
 			log.Fatal(err)
+			return
 		}
 	}
+
+	DB.Update(func(txn *badger.Txn) error {
+		return txn.Set([]byte(DB_CHECK_KEY), []byte("STORED"))
+	})
 }
 
 // // extractValidators navigates through the nested maps to extract the validators

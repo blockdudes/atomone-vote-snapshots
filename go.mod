@@ -3,10 +3,12 @@ module cosmos-vote-snapshot
 go 1.21.3
 
 require (
+	github.com/briandowns/spinner v1.23.0
 	github.com/cosmos/cosmos-sdk v0.50.2
 	github.com/dgraph-io/badger/v4 v4.2.0
+	github.com/gin-gonic/gin v1.8.1
 	github.com/goccy/go-json v0.10.2
-	github.com/ostafen/clover v1.2.0
+	github.com/logrusorgru/aurora/v4 v4.0.0
 )
 
 require (
@@ -39,14 +41,18 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/dgraph-io/badger/v2 v2.2007.4 // indirect
-	github.com/dgraph-io/badger/v3 v3.2103.2 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/fatih/color v1.15.0 // indirect
 	github.com/getsentry/sentry-go v0.25.0 // indirect
+	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-kit/kit v0.12.0 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
+	github.com/go-playground/locales v0.14.0 // indirect
+	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/go-playground/validator/v10 v10.11.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.2.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -61,15 +67,20 @@ require (
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect
+	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/linxGnu/grocksdb v1.8.6 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20230904125328-1f23a7beb09a // indirect
+	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/petermattis/goid v0.0.0-20230904192822-1876fd5063bc // indirect
 	github.com/pingcap/errors v0.11.5-0.20210425183316-da1aaba5fb63 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -81,13 +92,13 @@ require (
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/rs/zerolog v1.31.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.1 // indirect
-	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/cobra v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
+	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.etcd.io/bbolt v1.3.8 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
@@ -96,6 +107,7 @@ require (
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/term v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20231016165738-49dd2c1f3d0b // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20231012201019-e917dd12ba7a // indirect
