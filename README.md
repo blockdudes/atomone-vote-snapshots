@@ -46,7 +46,8 @@
   You will receive a JSON response with the vote data, structured as follows:
   ```json
   {
-    "shares": 101.0303060375804,
+    "shares": 101.0303060375804, // his total shares/voting power
+    // how his validators voted
     "validators": [
       {
         "shares": 101.0303060375804,
@@ -61,7 +62,7 @@
     "vote_no": 0,
     "vote_no_with_veto": 0,
     "vote_yes": 101.0303060375804,
-    "voter": "cosmos10mkyedc...",
-    "voted_by": 0
+    "voter": "cosmos10mkyedc...", // voter address
+    "voted_by": 0 // 0 = user, 1 = validator
   }
   ```
